@@ -36,6 +36,8 @@ public enum KnownError: LocalizedError {
     case releasedTooSoon(daysSinceRelease: Int, releasedForDays: Int)
     /// The user has opted to skip updating their current version of the app to the current App Store version.
     case skipVersionUpdate(installedVersion: String, appStoreVersion: String)
+    
+    case customJSONToModelFailure
 
     /// The localized description for each error handled by Siren.
     public var localizedDescription: String {
@@ -68,6 +70,8 @@ public enum KnownError: LocalizedError {
             return "\(KnownError.sirenError) The app has been released for \(daysSinceRelease) days, but Siren cannot prompt the user until \(releasedForDays) days have passed."
         case .skipVersionUpdate(let installedVersion, let appStoreVersion):
             return "\(KnownError.sirenError) The user has opted to skip updating their current version of the app (\(installedVersion)) to the current App Store version (\(appStoreVersion))."
+        case .customJSONToModelFailure:
+            return "\(KnownError.sirenError) Could not produce LookupModel."
         }
     }
 

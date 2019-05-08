@@ -109,14 +109,40 @@ public extension Siren {
             }
         }
     }
+    
+    func wail(json: [String: Any],
+              completion handler: ResultsHandler? = nil) {
+        resultsHandler = handler
+        
+        removeForegroundObservers()
+        performVersionCheck(json: json)
+        
+        // Add background app state change observers.
+        addBackgroundObservers()
+    }
 }
 
 // MARK: - Version Check and Alert Presentation Flow
 
 private extension Siren {
     /// Initiates the unidirectional version checking flow.
-    func performVersionCheck() {
+    func performVersionCheck(json: [String:Any]? = nil) {
         alertPresentationDate = UserDefaults.alertPresentationDate
+        
+        if json != nil {
+            do {
+                let jsonDecoder = JSONDecoder()
+                
+                let jsonData = try JSONSerialization.data(withJSONObject: json as Any,
+                                                             options: JSONSerialization.WritingOptions.prettyPrinted)
+                let lookupModel = try jsonDecoder.decode(LookupModel.self, from: jsonData)
+                self.validate(model: lookupModel)
+            }
+            catch {
+                resultsHandler?(nil, .customJSONToModelFailure)
+            }
+        }
+        
         apiManager.performVersionCheckRequest { [weak self] (lookupModel, error) in
             guard let self = self else { return }
             guard let lookupModel = lookupModel, error == nil else {
