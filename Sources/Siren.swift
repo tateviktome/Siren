@@ -141,6 +141,7 @@ private extension Siren {
             catch {
                 resultsHandler?(nil, .customJSONToModelFailure)
             }
+            return
         }
         
         apiManager.performVersionCheckRequest { [weak self] (lookupModel, error) in
